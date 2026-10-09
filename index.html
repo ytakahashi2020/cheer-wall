@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; base-uri 'none'; form-action 'none'">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cheer Wall</title>
+<style>
+:root{--cream:#fff7e6;--peach:#ffe0b8;--orange:#ff8a3d;--btn:#d9550a;--btn2:#b84300;--brown:#7a4b00;--ink:#3a2a14;--card:#fff}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:system-ui,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;color:var(--ink);background:linear-gradient(#fff7e6,#ffe9c9 60%,#ffe0b8) fixed;min-height:100vh;line-height:1.5}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #1d5fd1;outline-offset:2px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1000px;margin:0 auto;padding:14px 16px 0}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;color:var(--brown)}
+.brand span.lg{font-size:26px}
+.lang{display:flex;background:#fff;border-radius:99px;padding:3px;box-shadow:0 2px 6px #7a4b0030}
+.lang button{border:0;background:none;padding:6px 12px;border-radius:99px;font-weight:700;font-size:14px;color:var(--brown)}
+.lang button[aria-pressed=true]{background:var(--btn);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:12px 16px 40px}
+.hero{text-align:center;padding:10px 0 6px;position:relative}
+.hero .tag{margin:0 auto;max-width:520px;color:var(--brown);font-size:14px}
+.hero h1{margin:6px 0 4px;font-size:clamp(22px,5.5vw,32px);color:var(--brown);line-height:1.25}
+.deco{position:absolute;font-size:22px;animation:fl 3.5s ease-in-out infinite;pointer-events:none}
+@keyframes fl{50%{transform:translateY(-8px) rotate(10deg)}}
+.rcpt{display:inline-flex;align-items:center;gap:8px;margin-top:8px;background:#fff;border-radius:14px;padding:6px 10px;box-shadow:0 2px 6px #7a4b0025;font-size:14px}
+.rcpt input{border:2px solid #f3d3a3;border-radius:8px;padding:6px 8px;width:130px;background:#fffdf8}
+.layout{display:grid;gap:18px;margin-top:16px}
+@media(min-width:820px){.layout{grid-template-columns:1fr 340px;align-items:start}.compose{position:sticky;top:12px}}
+.panel{background:rgba(255,255,255,.55);border-radius:22px;padding:16px;box-shadow:0 4px 14px #7a4b0020}
+.wallhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.count{font-weight:800;color:var(--brown)}
+.wall{background:radial-gradient(#f3cf9a 1.2px,transparent 1.4px) 0 0/18px 18px,#fff3dc;border-radius:16px;padding:22px 14px 18px;min-height:260px;display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:22px 16px;border:3px dashed #f0c78d}
+.empty{grid-column:1/-1;text-align:center;color:var(--brown);align-self:center;padding:30px 10px}
+.note{position:relative;padding:20px 12px 10px;min-height:140px;border-radius:4px;box-shadow:2px 4px 8px #0003;transform:rotate(var(--r));transition:transform .2s;display:flex;flex-direction:column}
+.note:hover{transform:rotate(0) scale(1.04);z-index:2}
+.note.new{animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.3) rotate(20deg);opacity:0}}
+.pin{position:absolute;top:-8px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff9a9a,#d02020);box-shadow:1px 2px 3px #0005}
+.c-yellow{background:#ffe27a}.c-pink{background:#ffb3c1}.c-green{background:#b5e8c9}.c-blue{background:#b9d7ff}.c-lav{background:#dcc9ff}
+.note .st{font-size:34px;line-height:1.1}
+.note .tx{font-size:15px;font-weight:600;margin-top:4px;flex:1;word-break:break-word}
+.note .fr{font-size:12px;margin-top:6px;opacity:.85;font-weight:700}
+.nact{display:flex;justify-content:space-between;margin-top:6px}
+.nact button{border:0;background:#ffffff90;border-radius:99px;padding:3px 9px;font-size:12px;min-height:28px}
+.nact button:hover{background:#fff}
+.btn{border:0;background:var(--btn);color:#fff;font-weight:800;border-radius:99px;padding:12px 22px;font-size:16px;box-shadow:0 4px 0 var(--btn2);transition:transform .1s}
+.btn:hover{background:#c24b06}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--btn2)}
+.btn[disabled]{background:#c9a98a;box-shadow:0 4px 0 #a98b6e;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--btn2);box-shadow:0 3px 0 #f0c78d}
+.btn.big{font-size:18px;padding:14px 28px}
+.link{background:none;border:0;color:var(--brown);text-decoration:underline;font-size:13px;padding:6px}
+h2{font-size:17px;margin:0 0 10px;color:var(--brown)}
+.lbl{display:block;font-size:13px;font-weight:700;color:var(--brown);margin:12px 0 6px}
+.stamps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stamp{background:#fff;border:3px solid transparent;border-radius:14px;padding:8px 0;font-size:28px;box-shadow:0 2px 4px #0002;transition:transform .12s}
+.stamp:hover{transform:translateY(-2px)}
+.stamp[aria-pressed=true]{border-color:var(--orange);background:#fff1e0}
+.field{width:100%;border:2px solid #f3d3a3;border-radius:12px;padding:10px 12px;background:#fff;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:0;background:#ffe9c9;border-radius:99px;padding:5px 10px;font-size:13px;color:var(--brown);min-height:30px}
+.chip:hover{background:#ffd9a3}
+.swatches{display:flex;gap:10px}
+.sw{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #0003}
+.sw[aria-pressed=true]{box-shadow:0 0 0 3px var(--btn)}
+.post{width:100%;margin-top:16px}
+.msg{min-height:22px;margin-top:8px;font-size:14px;font-weight:700;text-align:center}
+.msg.err{color:#b3261e}.msg.ok{color:#1b6b34}
+/* overlay */
+.ov{position:fixed;inset:0;z-index:50;background:linear-gradient(#fff7e6,#ffcf94);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.ov[hidden]{display:none}
+.ovbox{width:100%;max-width:420px;text-align:center;position:relative;padding-top:30px}
+.x{position:absolute;top:0;right:0;width:44px;height:44px;border-radius:50%;border:0;background:#fff;font-size:18px;box-shadow:0 2px 6px #0003}
+.ovtitle{font-weight:800;font-size:clamp(20px,5.5vw,26px);color:var(--brown);margin:16px 0}
+.ocard{background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 8px 20px #7a4b0040;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ocard.pop{animation:cardin .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes cardin{from{transform:translateY(30px) scale(.8);opacity:0}}
+.ocard .big{font-size:60px;line-height:1.1}
+.ocard .ovt{font-size:22px;font-weight:700;margin-top:10px;min-height:2.8em;word-break:break-word}
+.ocard .ovf{font-size:14px;color:#6d6252;margin-top:8px}
+.prog{margin:14px 0;color:var(--brown);font-size:14px;font-weight:700}
+.dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.dots i{width:8px;height:8px;border-radius:50%;background:#f0c78d}.dots i.on{background:var(--btn)}
+.finale{background:#fff;border-radius:22px;padding:26px 18px;box-shadow:0 8px 20px #7a4b0040}
+.finale .row{font-size:30px;letter-spacing:4px;margin:12px 0;word-break:break-all}
+.finale p{color:var(--brown);margin:6px 0 16px}
+.finale .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#cf{position:fixed;inset:0;z-index:60;pointer-events:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="lg" aria-hidden="true">📣</span><span>Cheer Wall</span></div>
+  <div class="lang" data-demo="lang-switch" role="group" data-i-aria="langAria">
+    <button type="button" id="lj" data-demo="lang-ja" aria-pressed="false">日本語</button>
+    <button type="button" id="le" data-demo="lang-en" aria-pressed="false">EN</button>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <span class="deco" style="left:6%;top:6px" aria-hidden="true">🎉</span>
+    <span class="deco" style="right:8%;top:20px;animation-delay:.8s" aria-hidden="true">✨</span>
+    <p class="tag" data-i="tagline"></p>
+    <h1 id="wallTitle" data-demo="wall-title"></h1>
+    <label class="rcpt"><span data-i="rcptLabel"></span>
+      <input id="nameIn" data-demo="recipient-input" maxlength="14" data-i-ph="defaultName" autocomplete="off"></label>
+  </section>
+
+  <div class="layout">
+    <section class="panel">
+      <div class="wallhead">
+        <span class="count" id="count" data-demo="note-count"></span>
+        <button type="button" class="btn big" id="giftBtn" data-demo="gift-button"></button>
+      </div>
+      <div class="wall" id="wall" data-demo="wall"></div>
+      <div style="text-align:right;margin-top:6px"><button type="button" class="link" id="resetBtn" data-demo="reset-samples" data-i="reset"></button></div>
+    </section>
+
+    <section class="panel compose">
+      <h2 data-i="pickStamp"></h2>
+      <div class="stamps" id="stamps" role="group" data-i-aria="pickStamp"></div>
+      <label class="lbl" for="msgIn" data-i="msgLabel"></label>
+      <input class="field" id="msgIn" data-demo="message-input" maxlength="40" data-i-ph="msgPh" autocomplete="off">
+      <div class="chips" id="chips" aria-label="Quick phrases" data-i-aria="quick"></div>
+      <label class="lbl" for="fromIn" data-i="fromLabel"></label>
+      <input class="field" id="fromIn" data-demo="from-input" maxlength="14" data-i-ph="fromPh" autocomplete="off">
+      <span class="lbl" data-i="colorLabel"></span>
+      <div class="swatches" id="swatches" role="group" data-i-aria="colorLabel"></div>
+      <button type="button" class="btn post" id="postBtn" data-demo="post-button" data-i="post"></button>
+      <div class="msg" id="msg" role="status" aria-live="polite" data-demo="status-message"></div>
+    </section>
+  </div>
+</main>
+
+<div class="ov" id="ov" hidden role="dialog" aria-modal="true" data-demo="gift-overlay">
+  <div class="ovbox">
+    <button type="button" class="x" id="ovClose" data-demo="gift-close" data-i-aria="close">✕</button>
+    <div class="ovtitle" id="ovTitle"></div>
+    <div id="stepView">
+      <div class="ocard" id="ocard" data-demo="gift-card">
+        <div class="big" id="ovStamp"></div>
+        <div class="ovt" id="ovText"></div>
+        <div class="ovf" id="ovFrom"></div>
+      </div>
+      <div class="prog"><div id="ovProg"></div><div class="dots" id="dots"></div></div>
+      <button type="button" class="btn big" id="ovNext" data-demo="gift-next"></button>
+    </div>
+    <div class="finale" id="finale" hidden data-demo="gift-finale">
+      <div style="font-size:54px" aria-hidden="true">🎊</div>
+      <h2 id="finT" style="font-size:22px;margin:6px 0"></h2>
+      <p id="finS"></p>
+      <div class="row" id="finRow" aria-hidden="true"></div>
+      <div class="btns">
+        <button type="button" class="btn" id="replayBtn" data-demo="gift-replay" data-i="replay"></button>
+        <button type="button" class="btn ghost" id="finClose" data-demo="gift-done" data-i="close"></button>
+      </div>
+    </div>
+  </div>
+</div>
+<canvas id="cf" aria-hidden="true"></canvas>
+
+<script>
+const I18N={
+ja:{
+title:"Cheer Wall｜みんなの応援ウォール",
+langAria:"言語切り替え",
+tagline:"スタンプ＋一言の付箋をみんなで貼って、紙吹雪にのせて贈ろう",
+wallFor:n=>`${n}さんへのエールウォール`,
+rcptLabel:"贈る相手",defaultName:"ゆうな",
+count:n=>`${n} 枚のエール`,
+gift:"🎉 贈る",giftHint:"まず1枚貼ってね",
+pickStamp:"スタンプをえらぶ",
+msgLabel:"一言",msgPh:"例：ぜったいできる！",
+quick:"すぐ使える一言",
+fromLabel:"あなたの名前",fromPh:"なまえ（空でもOK）",
+colorLabel:"付箋の色",
+post:"📌 壁にはる",posted:"壁に貼りました！",needMsg:"一言を書いてね",
+reset:"サンプルに戻す",resetDone:"サンプルに戻しました",
+empty:"まだ付箋がありません。スタンプと一言で最初の1枚を貼ろう！",
+anon:"だれか",
+like:"応援を足す",del:"はがす",
+close:"とじる",
+ovTitle:n=>`${n}さんへ\nみんなからのエール！`,
+prog:(i,n)=>`${i} / ${n} 枚目`,
+next:"つぎへ ▶",last:"おわり 🎉",
+from:n=>`from ${n}`,
+finT:"エール、届きました！",
+finS:(c,n)=>`${c}枚の気持ちが${n}さんに届きますように`,
+replay:"もう一度見る",
+stampNames:["がんばれ","にじ","力もち","さくら","スター","幸運","おいわい","ハート"],
+colors:["きいろ","ピンク","みどり","あお","むらさき"],
+phrases:["がんばれ！","ありがとう","ぜったいできる！","応援してるよ","おめでとう！"],
+samples:[
+ {t:"ぜったいできる！",f:"たくや"},{t:"いつもありがとう",f:"ミサキ"},{t:"応援してるよ",f:"ソウ"},
+ {t:"大丈夫、きっとできる！",f:"ケンタ"},{t:"ゆうなの笑顔が大好き",f:"ユイ"},{t:"本番、楽しんでね！",f:"さとう先生"}]
+},
+en:{
+title:"Cheer Wall – Our cheering wall",
+langAria:"Language",
+tagline:"Stick stamps and short notes together, then send them with confetti",
+wallFor:n=>`Cheer Wall for ${n}`,
+rcptLabel:"For",defaultName:"Yuna",
+count:n=>n===1?"1 cheer":`${n} cheers`,
+gift:"🎉 Send it",giftHint:"Stick at least one note first",
+pickStamp:"Pick a stamp",
+msgLabel:"Your message",msgPh:"e.g. You can do it!",
+quick:"Quick phrases",
+fromLabel:"Your name",fromPh:"Name (optional)",
+colorLabel:"Note color",
+post:"📌 Stick on the wall",posted:"Stuck on the wall!",needMsg:"Please write a short message.",
+reset:"Reset to samples",resetDone:"Back to the sample notes.",
+empty:"No notes yet. Pick a stamp and add the first one!",
+anon:"Someone",
+like:"Add a cheer",del:"Remove",
+close:"Close",
+ovTitle:n=>`For ${n}\nCheers from everyone!`,
+prog:(i,n)=>`Note ${i} of ${n}`,
+next:"Next ▶",last:"Finish 🎉",
+from:n=>`from ${n}`,
+finT:"Your cheers have arrived!",
+finS:(c,n)=>`${c} notes full of love, just for ${n}`,
+replay:"Watch again",
+stampNames:["Go for it","Rainbow","Strong","Blossom","Star","Good luck","Party","Heart"],
+colors:["Yellow","Pink","Green","Blue","Purple"],
+phrases:["Go for it!","Thank you!","You can do it!","I'm cheering for you!","Congratulations!"],
+samples:[
+ {t:"You can totally do it!",f:"Takuya"},{t:"Thank you for always being there",f:"Misaki"},{t:"We're rooting for you",f:"Sou"},
+ {t:"Don't worry, you've got this!",f:"Kenta"},{t:"Your smile makes my day",f:"Yui"},{t:"Have fun on the big day!",f:"Ms. Sato"}]
+}};
+const STAMPS=["🔥","🌈","💪","🌸","⭐","🍀","🎉","💖"];
+const COLORS=["yellow","pink","green","blue","lav"];
+const SWC=["#ffe27a","#ffb3c1","#b5e8c9","#b9d7ff","#dcc9ff"];
+const SAMPLE_NOTES=()=>[
+ {id:1,st:"🔥",c:"yellow",s:0,likes:2},{id:2,st:"🌸",c:"pink",s:1,likes:1},{id:3,st:"🍀",c:"green",s:2,likes:0},
+ {id:4,st:"💪",c:"blue",s:3,likes:3},{id:5,st:"🌈",c:"lav",s:4,likes:1},{id:6,st:"⭐",c:"yellow",s:5,likes:0}];
+
+const $=id=>document.getElementById(id);
+let lang="en";
+try{ if(window.APP_LANG==="ja"||window.APP_LANG==="en")lang=window.APP_LANG;
+ else{const q=new URLSearchParams(location.search).get("lang");
+  if(q==="ja"||q==="en")lang=q;
+  else{let s=null;try{s=localStorage.getItem("lang")}catch(e){} if(s==="ja"||s==="en")lang=s;}}
+}catch(e){}
+const t=(k,...a)=>{const v=I18N[lang][k];return typeof v==="function"?v(...a):v};
+
+let state={notes:SAMPLE_NOTES(),name:""};
+try{const raw=localStorage.getItem("cheerwall_v1");if(raw){const o=JSON.parse(raw);if(o&&Array.isArray(o.notes)){state.notes=o.notes;state.name=o.name||""}}}catch(e){}
+const save=()=>{try{localStorage.setItem("cheerwall_v1",JSON.stringify(state))}catch(e){}};
+let stamp=STAMPS[0],color=COLORS[0],newId=null,step=0,finale=false,tw=null,msgTimer=null;
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+const nm=()=>state.name.trim()||t("defaultName");
+const noteText=n=>n.s!=null?I18N[lang].samples[n.s].t:n.text;
+const noteFrom=n=>{const f=n.s!=null?I18N[lang].samples[n.s].f:n.from;return f||t("anon")};
+function h(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+
+function applyLang(){
+  document.documentElement.lang=lang;document.title=t("title");
+  document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));
+  document.querySelectorAll("[data-i-ph]").forEach(e=>e.placeholder=t(e.dataset.iPh));
+  document.querySelectorAll("[data-i-aria]").forEach(e=>e.setAttribute("aria-label",t(e.dataset.iAria)));
+  $("lj").setAttribute("aria-pressed",lang==="ja");$("le").setAttribute("aria-pressed",lang==="en");
+  renderStamps();renderChips();renderSwatches();renderAll();
+  if(!$("ov").hidden)renderOv(false);
+}
+function renderAll(){
+  $("wallTitle").textContent=t("wallFor",nm());
+  $("count").textContent=t("count",state.notes.length);
+  const g=$("giftBtn");g.textContent=t("gift");g.disabled=!state.notes.length;g.title=state.notes.length?"":t("giftHint");
+  renderWall();
+}
+function renderStamps(){
+  const box=$("stamps");box.innerHTML="";
+  STAMPS.forEach((s,i)=>{const b=h("button","stamp",s);b.type="button";b.dataset.demo="stamp-"+i;
+   b.setAttribute("aria-label",I18N[lang].stampNames[i]);b.setAttribute("aria-pressed",s===stamp);
+   b.onclick=()=>{stamp=s;renderStamps()};box.appendChild(b)});
+}
+function renderChips(){
+  const box=$("chips");box.innerHTML="";
+  I18N[lang].phrases.forEach((p,i)=>{const b=h("button","chip",p);b.type="button";b.dataset.demo="phrase-"+i;
+   b.onclick=()=>{$("msgIn").value=p;$("msgIn").focus()};box.appendChild(b)});
+}
+function renderSwatches(){
+  const box=$("swatches");box.innerHTML="";
+  COLORS.forEach((c,i)=>{const b=h("button","sw");b.type="button";b.dataset.demo="color-"+c;
+   b.style.background=SWC[i];b.setAttribute("aria-label",I18N[lang].colors[i]);b.setAttribute("aria-pressed",c===color);
+   b.onclick=()=>{color=c;renderSwatches()};box.appendChild(b)});
+}
+function renderWall(){
+  const w=$("wall");w.innerHTML="";
+  if(!state.notes.length){w.appendChild(h("div","empty",t("empty")));return}
+  state.notes.forEach(n=>{
+    const el=h("div","note c-"+n.c+(n.id===newId?" new":""));
+    el.style.setProperty("--r",(((n.id*37)%9)-4)+"deg");
+    el.dataset.demo="note-"+n.id;
+    el.appendChild(h("span","pin"));
+    el.appendChild(h("div","st",n.st));
+    el.appendChild(h("div","tx",noteText(n)));
+    el.appendChild(h("div","fr","- "+noteFrom(n)));
+    const a=h("div","nact");
+    const l=h("button","",n.likes?"❤️ "+n.likes:"🤍");l.type="button";l.dataset.demo="note-like-"+n.id;l.setAttribute("aria-label",t("like"));
+    l.onclick=()=>{n.likes=(n.likes||0)+1;save();renderWall()};
+    const d=h("button","","✕");d.type="button";d.dataset.demo="note-delete-"+n.id;d.setAttribute("aria-label",t("del"));
+    d.onclick=()=>{state.notes=state.notes.filter(x=>x.id!==n.id);save();renderAll()};
+    a.append(l,d);el.appendChild(a);w.appendChild(el);
+  });
+  newId=null;
+}
+function say(txt,cls){const m=$("msg");m.textContent=txt;m.className="msg "+cls;clearTimeout(msgTimer);msgTimer=setTimeout(()=>{m.textContent="";m.className="msg"},3000)}
+
+$("postBtn").onclick=()=>{
+  const text=$("msgIn").value.trim();
+  if(!text){say(t("needMsg"),"err");$("msgIn").focus();return}
+  const id=state.notes.reduce((m,n)=>Math.max(m,n.id),0)+1;
+  state.notes.push({id,st:stamp,c:color,text,from:$("fromIn").value.trim(),likes:0});
+  newId=id;save();$("msgIn").value="";
+  renderAll();say(t("posted"),"ok");
+  const el=document.querySelector('[data-demo="note-'+id+'"]');
+  if(el&&el.scrollIntoView)el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});
+};
+$("msgIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("postBtn").click()});
+$("nameIn").addEventListener("input",e=>{state.name=e.target.value;save();$("wallTitle").textContent=t("wallFor",nm())});
+$("nameIn").value=state.name;
+$("resetBtn").onclick=()=>{state.notes=SAMPLE_NOTES();state.name="";$("nameIn").value="";save();renderAll();say(t("resetDone"),"ok")};
+$("lj").onclick=()=>setLang("ja");$("le").onclick=()=>setLang("en");
+function setLang(l){lang=l;try{localStorage.setItem("lang",l)}catch(e){}applyLang()}
+
+/* ---- gift overlay ---- */
+function typeInto(el,text){
+  clearInterval(tw);
+  if(reduce){el.textContent=text;return}
+  const arr=Array.from(text);let i=0;el.textContent="";
+  tw=setInterval(()=>{i++;el.textContent=arr.slice(0,i).join("");if(i>=arr.length)clearInterval(tw)},50);
+}
+function renderOv(type){
+  const n=state.notes.length;
+  $("ovTitle").textContent=t("ovTitle",nm());$("ovTitle").style.whiteSpace="pre-line";
+  $("stepView").hidden=finale;$("finale").hidden=!finale;
+  if(finale){
+    $("ovTitle").textContent="";
+    $("finT").textContent=t("finT");$("finS").textContent=t("finS",n,nm());
+    $("finRow").textContent=state.notes.map(x=>x.st).join(" ");
+    return;
+  }
+  const nt=state.notes[step];if(!nt)return;
+  $("ovStamp").textContent=nt.st;
+  if(type)typeInto($("ovText"),noteText(nt));else{clearInterval(tw);$("ovText").textContent=noteText(nt)}
+  $("ovFrom").textContent=t("from",noteFrom(nt));
+  $("ovProg").textContent=t("prog",step+1,n);
+  const d=$("dots");d.innerHTML="";
+  for(let i=0;i<n;i++){const s=document.createElement("i");if(i<=step)s.className="on";d.appendChild(s)}
+  $("ovNext").textContent=step<n-1?t("next"):t("last");
+  const c=$("ocard");c.classList.remove("pop");void c.offsetWidth;c.classList.add("pop");
+}
+function openGift(){
+  if(!state.notes.length)return;
+  step=0;finale=false;$("ov").hidden=false;document.body.style.overflow="hidden";
+  renderOv(true);burst(140);$("ovNext").focus();
+}
+function closeGift(){clearInterval(tw);$("ov").hidden=true;document.body.style.overflow="";$("giftBtn").focus()}
+$("giftBtn").onclick=openGift;
+$("ovClose").onclick=closeGift;$("finClose").onclick=closeGift;
+$("ovNext").onclick=()=>{
+  if(step<state.notes.length-1){step++;renderOv(true);burst(40)}
+  else{finale=true;renderOv(false);burst(220);setTimeout(()=>burst(120),500)}
+};
+$("replayBtn").onclick=()=>{step=0;finale=false;renderOv(true);burst(120);$("ovNext").focus()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("ov").hidden)closeGift()});
+
+/* ---- confetti ---- */
+const cv=$("cf"),cx=cv.getContext("2d");let P=[],run=false;
+function size(){cv.width=innerWidth;cv.height=innerHeight}
+addEventListener("resize",size);size();
+const CC=["#ff8a3d","#ffd23f","#ff6f91","#4cc38a","#4da3ff","#b184ff","#fff"];
+function burst(n){
+  if(reduce)n=Math.round(n/4);
+  const W=cv.width,H=cv.height;
+  for(let i=0;i<n;i++){
+    const k=i%3;let x,y,vx,vy;
+    if(k===0){x=0;y=H;vx=4+Math.random()*9;vy=-(10+Math.random()*14)}
+    else if(k===1){x=W;y=H;vx=-(4+Math.random()*9);vy=-(10+Math.random()*14)}
+    else{x=Math.random()*W;y=-20;vx=(Math.random()-.5)*3;vy=2+Math.random()*4}
+    P.push({x,y,vx,vy,r:Math.random()*6,vr:(Math.random()-.5)*.4,w:6+Math.random()*7,h:4+Math.random()*6,c:CC[(Math.random()*CC.length)|0],round:Math.random()<.25});
+  }
+  if(!run){run=true;requestAnimationFrame(tick)}
+}
+function tick(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  P=P.filter(p=>p.y<cv.height+30);
+  P.forEach(p=>{
+    p.vy+=.28;p.vx*=.99;p.vy*=.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;
+    if(p.round){cx.beginPath();cx.arc(0,0,p.w/2.4,0,6.3);cx.fill()}else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    cx.restore();
+  });
+  if(P.length)requestAnimationFrame(tick);else{run=false;cx.clearRect(0,0,cv.width,cv.height)}
+}
+
+applyLang();
+</script>
+</body>
+</html>
